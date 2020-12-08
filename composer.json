@@ -1,0 +1,28 @@
+{
+    "name": "spatialest/csv",
+    "description": "The best library for CSV manipulation in the whole of Coleraine",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matias Navarro Carter",
+            "email": "mnavarro@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "phpunit/phpunit": "^9.5",
+        "ext-mbstring": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spatialest\\Csv\\": "src"
+        },
+        "files": ["functions.php"]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Spatialest\\Csv\\": "tests"
+        }
+    }
+}
