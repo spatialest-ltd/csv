@@ -3,7 +3,6 @@
 namespace Spatialest\Csv\BuffIo;
 
 use PHPUnit\Framework\TestCase;
-use Spatialest\Csv\Io\ResourceReader;
 
 /**
  * Class ReaderTest

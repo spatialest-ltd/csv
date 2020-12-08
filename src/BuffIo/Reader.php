@@ -1,29 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * @project Spatialest CSV
+ * @link https://github.com/spatialest-ltd/csv
+ * @package spatialest/csv
+ * @author Matias Navarro-Carter matias.navarro@spatialest.com
+ * @license MIT
+ * @copyright Spatialest Inc
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Spatialest\Csv\BuffIo;
 
-use Spatialest\Csv\Io\Reader as IoReader;
+use Spatialest\Csv\Io;
+use Spatialest\Csv\Str;
 
 /**
- * The Reader composes an IoReader with useful buffered io operations
- *
- * @package Spatialest\Csv\BuffIo
+ * The Reader composes an Io\Reader with useful buffered io operations.
  */
 class Reader
 {
-    /**
-     * @var IoReader
-     */
-    private IoReader $reader;
+    private Io\Reader $reader;
     private string $buffer;
     private bool $eof;
 
     /**
      * Reader constructor.
-     * @param IoReader $reader
      */
-    public function __construct(IoReader $reader)
+    public function __construct(Io\Reader $reader)
     {
         $this->reader = $reader;
         $this->eof = false;
@@ -31,9 +39,9 @@ class Reader
     }
 
     /**
-     * Reads until the first occurrence of a string
-     * @param string $delimiter
-     * @return string|null
+     * Reads until the first occurrence of a string.
+     *
+     * @psalm-ignore PossiblyUndefinedVariable
      */
     public function readString(string $delimiter): ?string
     {
@@ -41,19 +49,21 @@ class Reader
             return null;
         }
         // Read to the buffer until the delimiter is found.
-        while (($pos = strpos($this->buffer, $delimiter)) === false) {
-            $chunk = $this->reader->read(IoReader::DEFAULT_BYTES);
+        while (($pos = Str\index($this->buffer, $delimiter)) === -1) {
+            $chunk = $this->reader->read(Io\Reader::DEFAULT_BYTES);
             if ($chunk === null || $chunk === '') {
                 $this->eof = true;
                 $string = $this->buffer === '' ? null : $this->buffer;
                 $this->buffer = '';
+
                 return $string;
             }
             $this->buffer .= $chunk;
         }
-        $pos++;
+        ++$pos;
         $line = substr($this->buffer, 0, $pos);
         $this->buffer = substr($this->buffer, $pos);
+
         return $line;
     }
 }

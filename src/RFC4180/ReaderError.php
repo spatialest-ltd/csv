@@ -14,19 +14,13 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Spatialest\Csv\Io;
+namespace Spatialest\Csv\RFC4180;
+
+use Exception;
 
 /**
- * Interface Reader.
+ * The ReaderError is the base error class for all the possible reader errors.
  */
-interface Reader
+class ReaderError extends Exception
 {
-    public const DEFAULT_BYTES = 4096;
-
-    /**
-     * Reads some bytes from a source.
-     *
-     * @return string|null on EOF
-     */
-    public function read(int $bytes = self::DEFAULT_BYTES): ?string;
 }

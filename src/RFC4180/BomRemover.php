@@ -1,13 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * @project Spatialest CSV
+ * @link https://github.com/spatialest-ltd/csv
+ * @package spatialest/csv
+ * @author Matias Navarro-Carter matias.navarro@spatialest.com
+ * @license MIT
+ * @copyright Spatialest Inc
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Spatialest\Csv\RFC4180;
 
 use Spatialest\Csv\Io\Reader;
 
 /**
- * The BomRemover composes a Reader that removes known byte order marks
- *
- * @package Spatialest\Csv\RFC4180
+ * The BomRemover composes a Reader that removes known byte order marks.
  */
 final class BomRemover implements Reader
 {
@@ -16,7 +28,7 @@ final class BomRemover implements Reader
         "\xFE\xFF",         // UTF-16 big endian
         "\xFF\xFE",         // UTF-16 little endian
         "\x00\x00\xFE\xFF", // UTF-32 big endian
-        "\xFF\xFE\x00\x00"  // UTF-32 little endian
+        "\xFF\xFE\x00\x00",  // UTF-32 little endian
     ];
 
     private Reader $reader;
@@ -24,7 +36,6 @@ final class BomRemover implements Reader
 
     /**
      * BomRemover constructor.
-     * @param Reader $reader
      */
     public function __construct(Reader $reader)
     {
@@ -32,10 +43,6 @@ final class BomRemover implements Reader
         $this->read = false;
     }
 
-    /**
-     * @param int $bytes
-     * @return string|null
-     */
     public function read(int $bytes = self::DEFAULT_BYTES): ?string
     {
         $chunk = $this->reader->read($bytes);
@@ -47,6 +54,7 @@ final class BomRemover implements Reader
         }
         $chunk = str_replace(self::$bomList, '', $chunk);
         $this->read = true;
+
         return $chunk;
     }
 }

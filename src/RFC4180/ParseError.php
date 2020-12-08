@@ -1,36 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * @project Spatialest CSV
+ * @link https://github.com/spatialest-ltd/csv
+ * @package spatialest/csv
+ * @author Matias Navarro-Carter matias.navarro@spatialest.com
+ * @license MIT
+ * @copyright Spatialest Inc
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Spatialest\Csv\RFC4180;
 
-
-use Exception;
-use Throwable;
-
 /**
- * Class ParseError
- * @package Spatialest\Csv\RFC4180
+ * The ParseError represents an error occurred in parsing.
  */
-class ParseError extends Exception
+class ParseError extends ReaderError
 {
+    private int $fileLine;
+    private int $recordNumber;
+    private ?int $col;
+
     /**
-     * @param int $startLine
-     * @param int $line
-     * @param int|null $column
-     * @param Throwable|null $error
-     * @return ParseError
+     * ParseError constructor.
      */
-    public static function create(int $startLine, int $line, int $column = null, Throwable $error = null): ParseError
+    public function __construct(string $message, int $fileLine, int $recordNumber, int $col = null)
     {
-        if ($column === null && $error !== null) {
-            $message = sprintf('record on line %d: %s', $line, $error->getMessage());
-            return new self($message, 0, $error);
+        $message = sprintf('Parse error: %s in record %s', $message, $recordNumber);
+        if ($fileLine !== $recordNumber) {
+            $message .= '; at file line '.$fileLine;
         }
-        if ($startLine !== $line) {
-            $message = sprintf('record on line %d; parse error on line %d, column %d: %s', $startLine, $line, $column, $error->getMessage());
-            return new self($message, 0, $error);
+        if ($col !== null) {
+            $message .= '; at column '.$col;
         }
-        $message = sprintf('parse error on line %d, column %d: %s', $line, $column, $error->getMessage());
-        return new self($message, 0, $error);
+        parent::__construct($message);
+        $this->fileLine = $fileLine;
+        $this->recordNumber = $recordNumber;
+        $this->col = $col;
+    }
+
+    public function getCol(): ?int
+    {
+        return $this->col;
+    }
+
+    public function getFileLine(): int
+    {
+        return $this->fileLine;
+    }
+
+    public function getRecordNumber(): int
+    {
+        return $this->recordNumber;
     }
 }

@@ -1,11 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * @project Spatialest CSV
+ * @link https://github.com/spatialest-ltd/csv
+ * @package spatialest/csv
+ * @author Matias Navarro-Carter matias.navarro@spatialest.com
+ * @license MIT
+ * @copyright Spatialest Inc
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Spatialest\Csv\Io;
 
 /**
- * Class ResourceReader
- * @package Spatialest\Csv\Io
+ * Class ResourceReader.
  */
 class ResourceReader implements Reader
 {
@@ -14,25 +26,19 @@ class ResourceReader implements Reader
      */
     private $resource;
 
-    /**
-     * @param string $filename
-     * @return ResourceReader
-     */
     public static function fromFile(string $filename): ResourceReader
     {
         if (!is_file($filename) || !is_readable($filename)) {
             throw new \InvalidArgumentException(sprintf('File %s must be a readable file', $filename));
         }
-        $resource =  fopen($filename, 'rb');
+        $resource = fopen($filename, 'rb');
         if ($resource === false) {
             throw new \InvalidArgumentException('Could not open resource');
         }
+
         return new self($resource);
     }
 
-    /**
-     * @return ResourceReader
-     */
     public static function stdin(): ResourceReader
     {
         return new self(STDIN);
@@ -40,6 +46,7 @@ class ResourceReader implements Reader
 
     /**
      * ResourceReader constructor.
+     *
      * @param resource $resource
      */
     public function __construct($resource)
@@ -59,6 +66,7 @@ class ResourceReader implements Reader
         if ($string === '') {
             return null;
         }
+
         return $string;
     }
 }

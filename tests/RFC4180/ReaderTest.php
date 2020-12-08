@@ -16,12 +16,38 @@ class ReaderTest extends TestCase
         $readerMock = $this->createMock(IoReader::class);
         $readerMock->expects(self::once())
             ->method('read')
-            ->willReturn("xxx,y y,zzz\n");
+            ->willReturn("xxx,yyy,zzz\n");
         $reader = Reader::fromReader($readerMock);
 
         $record = $reader->readRecord();
 
-        self::assertSame(['xxx', 'y y', 'zzz'], $record);
+        self::assertSame(['xxx', 'yyy', 'zzz'], $record);
+    }
+
+    public function testItReadsRecordWithTabSeparator(): void
+    {
+        $readerMock = $this->createMock(IoReader::class);
+        $readerMock->expects(self::once())
+            ->method('read')
+            ->willReturn("xxx\tyyy\tzzz\n");
+        $reader = Reader::fromReader($readerMock);
+        $reader->comma = "\t";
+        $record = $reader->readRecord();
+
+        self::assertSame(['xxx', 'yyy', 'zzz'], $record);
+    }
+
+    public function testItReadsRecordUnquotedWithNonAsciiChar(): void
+    {
+        $readerMock = $this->createMock(IoReader::class);
+        $readerMock->expects(self::once())
+            ->method('read')
+            ->willReturn("xxx,yúy,zzz\n");
+        $reader = Reader::fromReader($readerMock);
+
+        $record = $reader->readRecord();
+
+        self::assertSame(['xxx', 'yúy', 'zzz'], $record);
     }
 
     public function testItReadsWithoutFinalNewLine(): void
@@ -45,6 +71,20 @@ class ReaderTest extends TestCase
             ->willReturn('xxx,y"y,zzz'."\n");
         $reader = Reader::fromReader($readerMock);
 
+        $this->expectExceptionMessage('Parse error: bare " in non-quoted field in record 1; at column 5');
+        $this->expectException(ParseError::class);
+        $reader->readRecord();
+    }
+
+    public function testItThrowsBareQuoteErrorWithRightEncoding(): void
+    {
+        $readerMock = $this->createMock(IoReader::class);
+        $readerMock->expects(self::once())
+            ->method('read')
+            ->willReturn('xxx,ú"y,zzz'."\n");
+        $reader = Reader::fromReader($readerMock);
+
+        $this->expectExceptionMessage('Parse error: bare " in non-quoted field in record 1; at column 5');
         $this->expectException(ParseError::class);
         $reader->readRecord();
     }
@@ -75,7 +115,8 @@ class ReaderTest extends TestCase
         $reader = Reader::fromReader($readerMock);
         self::assertSame(['xxx', 'yyy', 'zzz'], $reader->readRecord());
         self::assertSame(['xxx', 'yyy', 'zzz'], $reader->readRecord());
-        $this->expectException(ParseError::class);
+        $this->expectExceptionMessage('Parse error: wrong number of fields in record 3');
+        $this->expectException(WrongFieldsNumberError::class);
         $reader->readRecord();
     }
 
@@ -95,8 +136,8 @@ class ReaderTest extends TestCase
         self::assertSame(['xxx', 'yyy', 'zzz'], $reader->readRecord());
         try {
             $reader->readRecord();
-        } catch (ParseError $error) {
-
+        } catch (WrongFieldsNumberError $error) {
+            self::assertSame(['xxx', 'zzz'], $error->getRecord());
         }
         self::assertSame(['xxx', 'yyy', 'zzz'], $reader->readRecord());
     }
@@ -166,7 +207,8 @@ class ReaderTest extends TestCase
             );
         $reader = Reader::fromReader($readerMock);
         self::assertSame(['xxx', 'yyy', 'zzz'], $reader->readRecord());
-        $this->expectException(ParseError::class);
+        $this->expectExceptionMessage('Parse error: wrong number of fields in record 2');
+        $this->expectException(WrongFieldsNumberError::class);
         $reader->readRecord();
     }
 
@@ -175,7 +217,7 @@ class ReaderTest extends TestCase
         $readerStub = $this->createStub(IoReader::class);
         $reader = Reader::fromReader($readerStub);
         $reader->comma = "\n";
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(ReaderError::class);
         $reader->readRecord();
     }
 }
