@@ -39,6 +39,16 @@ class ResourceReader implements Reader
         return new self($resource);
     }
 
+    public static function fromUrl(string $url): ResourceReader
+    {
+        $resource = @fopen($url, 'rb');
+        if (!$resource) {
+            throw new \InvalidArgumentException('Could not fetch url');
+        }
+
+        return new self($resource);
+    }
+
     public static function stdin(): ResourceReader
     {
         return new self(STDIN);

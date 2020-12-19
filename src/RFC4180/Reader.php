@@ -19,6 +19,7 @@ namespace Spatialest\Csv\RFC4180;
 use Generator;
 use Spatialest\Csv\BuffIo;
 use Spatialest\Csv\Io;
+use Spatialest\Csv\Io\ResourceReader;
 use Spatialest\Csv\Str;
 use Spatialest\Csv\Utf8;
 
@@ -79,8 +80,19 @@ class Reader implements \IteratorAggregate
     public bool $trimLeadingSpace;
     public bool $lazyQuotes;
 
-    public static function fromReader(Io\Reader $reader): Reader
+    public static function fromFile(string $filename, bool $removeBom = true): Reader
     {
+        $reader = ResourceReader::fromFile($filename);
+
+        return self::fromReader($reader, $removeBom);
+    }
+
+    public static function fromReader(Io\Reader $reader, bool $removeBom = true): Reader
+    {
+        if ($removeBom === true) {
+            $reader = new BomRemover($reader);
+        }
+
         return new self(new BuffIo\Reader($reader));
     }
 
@@ -100,12 +112,9 @@ class Reader implements \IteratorAggregate
         $this->expectedFields = 0;
     }
 
-    /**
-     * @throws ReaderError
-     */
-    public function getIterator(): Generator
+    public function getIterator(): RecordIterator
     {
-        return $this->readAll();
+        return new RecordIterator($this);
     }
 
     /**

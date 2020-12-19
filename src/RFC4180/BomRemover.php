@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Spatialest\Csv\RFC4180;
 
 use Spatialest\Csv\Io\Reader;
+use Spatialest\Csv\Str;
 
 /**
  * The BomRemover composes a Reader that removes known byte order marks.
@@ -52,7 +53,13 @@ final class BomRemover implements Reader
         if (!is_string($chunk)) {
             return null;
         }
-        $chunk = str_replace(self::$bomList, '', $chunk);
+        foreach (self::$bomList as $bom) {
+            if (Str\index($chunk, $bom) === 0) {
+                $bomLen = strlen($bom);
+                $chunk = substr($chunk, $bomLen);
+                break;
+            }
+        }
         $this->read = true;
 
         return $chunk;

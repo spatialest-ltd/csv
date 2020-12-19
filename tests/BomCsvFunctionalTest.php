@@ -17,21 +17,17 @@ declare(strict_types=1);
 namespace Spatialest\Csv;
 
 use PHPUnit\Framework\TestCase;
-use Spatialest\Csv\RFC4180\RecordIterator;
 use Spatialest\Csv\RFC4180\Reader;
 
 /**
- * Class BrokenCsvParsingFunctionalTest.
+ * Class BomCsvFunctionalTest.
  */
-class BrokenCsvParsingFunctionalTest extends TestCase
+class BomCsvFunctionalTest extends TestCase
 {
-    public function testItParsesBrokenOne(): void
+    public function testItParsesBomFile(): void
     {
-        $reader = Reader::fromFile(__DIR__.'/broken1.csv');
-        $iterator = new RecordIterator($reader);
-        foreach ($iterator as $record) {
-            // Empty on purpose.
-        }
-        self::assertCount(9, $iterator->getErrors());
+        $reader = Reader::fromFile(__DIR__.'/bom.csv');
+        $reader->comma = ';';
+        self::assertSame(['sku', 'name'], $reader->readRecord());
     }
 }

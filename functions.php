@@ -31,6 +31,11 @@ function index(string $haystack, string $needle): int
     return -1;
 }
 
+function slice(string $string, int $offset, int $length = 0): string
+{
+    return substr($string, $offset, $length);
+}
+
 /**
  * Returns the length of a string.
  */
