@@ -19,7 +19,7 @@ namespace Spatialest\Csv\RFC4180;
 use Generator;
 use Spatialest\Csv\BuffIo;
 use Spatialest\Csv\Io;
-use Spatialest\Csv\Io\ResourceReader;
+use Spatialest\Csv\Io\File;
 use Spatialest\Csv\Str;
 use Spatialest\Csv\Utf8;
 
@@ -82,7 +82,7 @@ class Reader implements \IteratorAggregate
 
     public static function fromFile(string $filename, bool $removeBom = true): Reader
     {
-        $reader = ResourceReader::fromFile($filename);
+        $reader = File::open($filename);
 
         return self::fromReader($reader, $removeBom);
     }
@@ -112,9 +112,9 @@ class Reader implements \IteratorAggregate
         $this->expectedFields = 0;
     }
 
-    public function getIterator(): RecordIterator
+    public function getIterator(): CsvIterator
     {
-        return new RecordIterator($this);
+        return CsvIterator::withHeaders($this);
     }
 
     /**
@@ -256,7 +256,7 @@ class Reader implements \IteratorAggregate
             $this->expectedFields = count($record);
         }
         if ($this->expectedFields !== count($record)) {
-            throw new WrongFieldsNumberError($record, $recordLine, $recordLine);
+            throw new FieldMismatchError($record, $recordLine, $recordLine);
         }
 
         return $record;

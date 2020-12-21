@@ -116,7 +116,7 @@ class ReaderTest extends TestCase
         self::assertSame(['xxx', 'yyy', 'zzz'], $reader->readRecord());
         self::assertSame(['xxx', 'yyy', 'zzz'], $reader->readRecord());
         $this->expectExceptionMessage('Parse error: wrong number of fields in record 3');
-        $this->expectException(WrongFieldsNumberError::class);
+        $this->expectException(FieldMismatchError::class);
         $reader->readRecord();
     }
 
@@ -136,7 +136,7 @@ class ReaderTest extends TestCase
         self::assertSame(['xxx', 'yyy', 'zzz'], $reader->readRecord());
         try {
             $reader->readRecord();
-        } catch (WrongFieldsNumberError $error) {
+        } catch (FieldMismatchError $error) {
             self::assertSame(['xxx', 'zzz'], $error->getRecord());
         }
         self::assertSame(['xxx', 'yyy', 'zzz'], $reader->readRecord());
@@ -208,7 +208,7 @@ class ReaderTest extends TestCase
         $reader = Reader::fromReader($readerMock);
         self::assertSame(['xxx', 'yyy', 'zzz'], $reader->readRecord());
         $this->expectExceptionMessage('Parse error: wrong number of fields in record 2');
-        $this->expectException(WrongFieldsNumberError::class);
+        $this->expectException(FieldMismatchError::class);
         $reader->readRecord();
     }
 

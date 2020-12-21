@@ -32,22 +32,17 @@ You can just create a `Spatialest\Csv\RFC4180\Reader` from a file
 and then iterate over all the records.
 
 ```php
-use Spatialest\Csv\Io\ResourceReader;
-use Spatialest\Csv\RFC4180\HeaderIterator;
+use Spatialest\Csv\Io\HttpGet;
 use Spatialest\Csv\RFC4180\Reader;
-use Spatialest\Csv\RFC4180\RecordIterator;
 
-$reader = Reader::fromReader(ResourceReader::fromUrl('https://data.wprdc.org/datastore/dump/5bbe6c55-bce6-4edb-9d04-68edeb6bf7b1'));
+$reader = Reader::fromReader(HttpGet::request('https://data.wprdc.org/datastore/dump/5bbe6c55-bce6-4edb-9d04-68edeb6bf7b1'));
+$iterator = $reader->getIterator();
 
-$records = new RecordIterator($reader);
-$hashes = new HeaderIterator($records);
-
-// This will emit the csv records as a line delimited json in the output
-foreach ($hashes as $record) {
-    fwrite(STDOUT, json_encode($record, JSON_THROW_ON_ERROR) .PHP_EOL);
+foreach ($reader as $record) {
+    fwrite(STDOUT, json_encode($record, JSON_THROW_ON_ERROR).PHP_EOL);
 }
 
-if ($records->hasErrors()) {
-    echo 'DANGER: There are '.count($records->getErrors()).' errors.';
+if ($iterator->hasErrors()) {
+    echo 'DANGER: There are '.count($iterator->getErrors()).' errors.';
 }
 ```

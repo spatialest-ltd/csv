@@ -17,14 +17,14 @@ declare(strict_types=1);
 namespace Spatialest\Csv\RFC4180;
 
 /**
- * The WrongFieldsNumberError is thrown when a record has an invalid count.
+ * The FieldMismatchError is thrown when a record has an invalid count.
  */
-class WrongFieldsNumberError extends ParseError
+class FieldMismatchError extends ParseError
 {
     private array $record;
 
     /**
-     * WrongFieldsNumberError constructor.
+     * FieldMismatchError constructor.
      */
     public function __construct(array $record, int $fileLine, int $recordNumber)
     {

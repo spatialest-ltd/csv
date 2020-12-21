@@ -17,7 +17,6 @@ declare(strict_types=1);
 namespace Spatialest\Csv;
 
 use PHPUnit\Framework\TestCase;
-use Spatialest\Csv\RFC4180\RecordIterator;
 use Spatialest\Csv\RFC4180\Reader;
 
 /**
@@ -28,7 +27,7 @@ class BrokenCsvParsingFunctionalTest extends TestCase
     public function testItParsesBrokenOne(): void
     {
         $reader = Reader::fromFile(__DIR__.'/broken1.csv');
-        $iterator = new RecordIterator($reader);
+        $iterator = $reader->getIterator();
         foreach ($iterator as $record) {
             // Empty on purpose.
         }
