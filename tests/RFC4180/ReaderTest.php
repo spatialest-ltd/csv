@@ -1,13 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * @project Spatialest CSV
+ * @link https://github.com/spatialest-ltd/csv
+ * @package spatialest/csv
+ * @author Matias Navarro-Carter matias.navarro@spatialest.com
+ * @license MIT
+ * @copyright Spatialest Inc
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Spatialest\Csv\RFC4180;
 
 use PHPUnit\Framework\TestCase;
 use Spatialest\Csv\Io\Reader as IoReader;
 
 /**
- * Class ReaderTest
- * @package Spatialest\Csv\RFC4180
+ * Class ReaderTest.
  */
 class ReaderTest extends TestCase
 {
@@ -55,7 +68,7 @@ class ReaderTest extends TestCase
         $readerMock = $this->createMock(IoReader::class);
         $readerMock->expects(self::exactly(2))
             ->method('read')
-            ->willReturnOnConsecutiveCalls("xxx,y y,zzz", null);
+            ->willReturnOnConsecutiveCalls('xxx,y y,zzz', null);
         $reader = Reader::fromReader($readerMock);
 
         $record = $reader->readRecord();
@@ -71,7 +84,7 @@ class ReaderTest extends TestCase
             ->willReturn('xxx,y"y,zzz'."\n");
         $reader = Reader::fromReader($readerMock);
 
-        $this->expectExceptionMessage('Parse error: bare " in non-quoted field in record 1; at column 5');
+        $this->expectExceptionMessage('Parse error: bare quote in non-quoted field in record 1; at column 5');
         $this->expectException(ParseError::class);
         $reader->readRecord();
     }
@@ -84,7 +97,7 @@ class ReaderTest extends TestCase
             ->willReturn('xxx,ú"y,zzz'."\n");
         $reader = Reader::fromReader($readerMock);
 
-        $this->expectExceptionMessage('Parse error: bare " in non-quoted field in record 1; at column 5');
+        $this->expectExceptionMessage('Parse error: bare quote in non-quoted field in record 1; at column 5');
         $this->expectException(ParseError::class);
         $reader->readRecord();
     }
@@ -99,7 +112,7 @@ class ReaderTest extends TestCase
 
         $record = $reader->readRecord();
 
-        self::assertSame(['xxx', 'y y','zzz'], $record);
+        self::assertSame(['xxx', 'y y', 'zzz'], $record);
     }
 
     public function testItDetectsWrongNumberOfFields(): void
