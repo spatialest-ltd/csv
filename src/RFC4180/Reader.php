@@ -63,6 +63,10 @@ class Reader implements \IteratorAggregate
      */
     public string $comma;
     /**
+     * The quote character is the character that is used to enclose and escape strings.
+     */
+    public string $quote;
+    /**
      * The expected number of fields for each record.
      * When zero the number of expected fields for each record is set based on
      * the number of field of the first record.
@@ -99,11 +103,12 @@ class Reader implements \IteratorAggregate
     /**
      * Reader constructor.
      */
-    public function __construct(BuffIo\Reader $reader, string $comma = ',')
+    public function __construct(BuffIo\Reader $reader, string $comma = ',', string $quote = '"')
     {
         $this->reader = $reader;
         $this->lineNum = 0;
         $this->comma = $comma;
+        $this->quote = $quote;
         $this->comment = null;
         $this->trimLeadingSpace = true;
         $this->lazyQuotes = false;
@@ -157,7 +162,7 @@ class Reader implements \IteratorAggregate
         }
 
         // We parse each field in the record
-        $quoteLen = Str\len(self::QUOTE);
+        $quoteLen = Str\len($this->quote);
         $commaLen = Str\len($this->comma);
         $recordLine = $this->lineNum;
         $this->recordBuffer = '';
@@ -167,7 +172,7 @@ class Reader implements \IteratorAggregate
             if ($this->trimLeadingSpace) {
                 $line = ltrim($line, ' ');
             }
-            if ($line === '' || $line[0] !== self::QUOTE) {
+            if ($line === '' || $line[0] !== $this->quote) {
                 // Non quoted string field
                 $i = Str\index($line, $this->comma);
                 $field = $line;
@@ -177,9 +182,9 @@ class Reader implements \IteratorAggregate
                     $field = substr($field, 0, Str\len($field) - $this->lengthNL($field));
                 }
                 // Check to make sure a quote does not appear in the field
-                if (!$this->lazyQuotes && ($j = Str\index($field, self::QUOTE)) >= 0) {
+                if (!$this->lazyQuotes && ($j = Str\index($field, $this->quote)) >= 0) {
                     $col = Utf8\runeCount(substr($fullLine, 0, Utf8\runeCount($fullLine) - Utf8\runeCount(substr($line, $j))));
-                    throw new ParseError('bare " in non-quoted field', $this->lineNum, $recordLine, $col);
+                    throw new ParseError('bare quote in non-quoted field', $this->lineNum, $recordLine, $col);
                 }
                 $this->recordBuffer .= $field;
                 $this->fieldIndexes[] = Str\len($this->recordBuffer);
@@ -192,16 +197,16 @@ class Reader implements \IteratorAggregate
                 // Quoted string field
                 $line = substr($line, $quoteLen);
                 while (true) {
-                    $i = Str\index($line, self::QUOTE);
+                    $i = Str\index($line, $this->quote);
                     if ($i >= 0) {
                         // Hit next quote
                         $this->recordBuffer .= substr($line, 0, $i);
                         $line = substr($line, $i + $quoteLen);
                         $rn = $line[0];
                         switch (true) {
-                            case $rn === self::QUOTE:
+                            case $rn === $this->quote:
                                 // "" sequence. We append the quote.
-                                $this->recordBuffer .= self::QUOTE;
+                                $this->recordBuffer .= $this->quote;
                                 $line = substr($line, $quoteLen);
                                 break;
                             case $rn === $this->comma:
@@ -215,12 +220,12 @@ class Reader implements \IteratorAggregate
                                 break 3;
                             case $this->lazyQuotes:
                                 // " sequence. Bare quote.
-                                $this->recordBuffer .= self::QUOTE;
+                                $this->recordBuffer .= $this->quote;
                                 break;
                             default:
                                 // "* sequence. Invalid non-escaped quote.
                                 $col = Utf8\runeCount(substr($fullLine, 0, Str\len($fullLine) - Str\len($line) - $quoteLen));
-                                throw new ParseError('extraneous or missing " in quoted-field', $this->lineNum, $recordLine, $col);
+                                throw new ParseError('extraneous or missing quote in quoted-field', $this->lineNum, $recordLine, $col);
                         }
                     } elseif ($line !== '') {
                         // Hit end of line. Copy all data so far.
@@ -235,7 +240,7 @@ class Reader implements \IteratorAggregate
                         // Abrupt end of file.
                         if (!$this->lazyQuotes) {
                             $col = Utf8\runeCount($fullLine);
-                            throw new ParseError('extraneous or missing " in quoted-field', $this->lineNum, $recordLine, $col);
+                            throw new ParseError('extraneous or missing quote in quoted-field', $this->lineNum, $recordLine, $col);
                         }
                         $this->fieldIndexes[] = Str\len($this->recordBuffer);
                         break 2;

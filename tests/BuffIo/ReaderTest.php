@@ -1,12 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * @project Spatialest CSV
+ * @link https://github.com/spatialest-ltd/csv
+ * @package spatialest/csv
+ * @author Matias Navarro-Carter matias.navarro@spatialest.com
+ * @license MIT
+ * @copyright Spatialest Inc
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Spatialest\Csv\BuffIo;
 
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class ReaderTest
- * @package Spatialest\Csv\BuffIo
+ * Class ReaderTest.
  */
 class ReaderTest extends TestCase
 {
@@ -25,7 +38,7 @@ class ReaderTest extends TestCase
         self::assertSame("This is line one\n", $reader->readString("\n"));
         self::assertSame("This is line two\n", $reader->readString("\n"));
         self::assertSame("This is line three\n", $reader->readString("\n"));
-        self::assertSame("This is line four", $reader->readString("\n"));
+        self::assertSame('This is line four', $reader->readString("\n"));
         self::assertNull($reader->readString("\n"));
     }
 
@@ -44,7 +57,7 @@ class ReaderTest extends TestCase
         self::assertSame("This is line one\n", $reader->readString("\n"));
         self::assertSame("\n", $reader->readString("\n"));
         self::assertSame("This is line three\n", $reader->readString("\n"));
-        self::assertSame("This is line four", $reader->readString("\n"));
+        self::assertSame('This is line four', $reader->readString("\n"));
         self::assertNull($reader->readString("\n"));
     }
 
@@ -75,7 +88,7 @@ class ReaderTest extends TestCase
         $readerMock->expects(self::exactly(5))
             ->method('read')
             ->willReturnOnConsecutiveCalls(
-                "This is line ",
+                'This is line ',
                 "one\nThis is line ",
                 "two\nThis is line ",
                 "three\nThis is line four",
@@ -86,7 +99,7 @@ class ReaderTest extends TestCase
         self::assertSame("This is line one\n", $reader->readString("\n"));
         self::assertSame("This is line two\n", $reader->readString("\n"));
         self::assertSame("This is line three\n", $reader->readString("\n"));
-        self::assertSame("This is line four", $reader->readString("\n"));
+        self::assertSame('This is line four', $reader->readString("\n"));
         self::assertNull($reader->readString("\n"));
     }
 }
