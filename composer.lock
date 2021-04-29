@@ -4,8 +4,65 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6dca9411cd9c9cb4892514b6aed4873e",
-    "packages": [],
+    "content-hash": "4b6bec48f95e732b4c1bfb97fdb5dd22",
+    "packages": [
+        {
+            "name": "castor/io",
+            "version": "0.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/castor-labs/io.git",
+                "reference": "273aa208e7a9eb97c1cd0552851f4d7c7ce68d2b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/castor-labs/io/zipball/273aa208e7a9eb97c1cd0552851f4d7c7ce68d2b",
+                "reference": "273aa208e7a9eb97c1cd0552851f4d7c7ce68d2b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "dev-master",
+                "phpunit/phpunit": "^9.5",
+                "vimeo/psalm": "^4.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Castor\\Io\\": "src"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Matias Navarro Carter",
+                    "email": "mnavarrocarter@gmail.com"
+                }
+            ],
+            "description": "Input/Output interfaces for PHP inspired in Golang",
+            "keywords": [
+                "golang",
+                "input",
+                "io",
+                "output",
+                "php",
+                "php8"
+            ],
+            "support": {
+                "issues": "https://github.com/castor-labs/io/issues",
+                "source": "https://github.com/castor-labs/io/tree/0.2.2"
+            },
+            "time": "2021-04-29T14:10:50+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "amphp/amp",
@@ -4785,7 +4842,8 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.4",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "ext-iconv": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.0.0"

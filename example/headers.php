@@ -14,12 +14,12 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-use Spatialest\Csv\Io\HttpGet;
+use Castor\Io\TestReader;
 use Spatialest\Csv\RFC4180\Reader;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-$reader = Reader::fromReader(HttpGet::request('https://data.wprdc.org/datastore/dump/5bbe6c55-bce6-4edb-9d04-68edeb6bf7b1'));
+$reader = Reader::fromReader(TestReader::fromFile('https://data.wprdc.org/datastore/dump/5bbe6c55-bce6-4edb-9d04-68edeb6bf7b1'));
 $iterator = $reader->getIterator();
 
 foreach ($reader as $record) {

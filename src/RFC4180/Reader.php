@@ -16,10 +16,9 @@ declare(strict_types=1);
 
 namespace Spatialest\Csv\RFC4180;
 
+use Castor\Io;
 use Generator;
 use Spatialest\Csv\BuffIo;
-use Spatialest\Csv\Io;
-use Spatialest\Csv\Io\File;
 use Spatialest\Csv\Str;
 use Spatialest\Csv\Utf8;
 
@@ -50,8 +49,6 @@ use Spatialest\Csv\Utf8;
  */
 class Reader implements \IteratorAggregate
 {
-    private const QUOTE = '"';
-
     private BuffIo\Reader $reader;
     private int $lineNum;
     private string $recordBuffer;
@@ -86,7 +83,7 @@ class Reader implements \IteratorAggregate
 
     public static function fromFile(string $filename, bool $removeBom = true): Reader
     {
-        $reader = File::open($filename);
+        $reader = Io\TestReader::fromFile($filename);
 
         return self::fromReader($reader, $removeBom);
     }

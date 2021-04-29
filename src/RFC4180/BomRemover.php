@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace Spatialest\Csv\RFC4180;
 
-use Spatialest\Csv\Io\Reader;
+use Castor\Io\Reader;
 use Spatialest\Csv\Str;
 
 /**
@@ -44,24 +44,24 @@ final class BomRemover implements Reader
         $this->read = false;
     }
 
-    public function read(int $bytes = self::DEFAULT_BYTES): ?string
+    /**
+     * {@inheritDoc}
+     */
+    public function read(int $length, string &$bytes): int
     {
-        $chunk = $this->reader->read($bytes);
+        $this->reader->read($length, $bytes);
         if ($this->read === true) {
-            return $chunk;
-        }
-        if (!is_string($chunk)) {
-            return null;
+            return strlen($bytes);
         }
         foreach (self::$bomList as $bom) {
-            if (Str\index($chunk, $bom) === 0) {
+            if (Str\index($bytes, $bom) === 0) {
                 $bomLen = strlen($bom);
-                $chunk = substr($chunk, $bomLen);
+                $bytes = substr($bytes, $bomLen);
                 break;
             }
         }
         $this->read = true;
 
-        return $chunk;
+        return strlen($bytes);
     }
 }

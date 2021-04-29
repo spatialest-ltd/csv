@@ -16,7 +16,7 @@ declare(strict_types=1);
 
 namespace Spatialest\Csv\BuffIo;
 
-use Spatialest\Csv\Io;
+use Castor\Io;
 use Spatialest\Csv\Str;
 
 /**
@@ -34,24 +34,28 @@ class Reader
     public function __construct(Io\Reader $reader)
     {
         $this->reader = $reader;
-        $this->eof = false;
         $this->buffer = '';
+        $this->eof = false;
     }
 
     /**
      * Reads until the first occurrence of a string.
      *
      * @psalm-ignore PossiblyUndefinedVariable
+     *
+     * @throws Io\Error
      */
     public function readString(string $delimiter): ?string
     {
         if ($this->eof === true && $this->buffer === '') {
             return null;
         }
+        $chunk = '';
         // Read to the buffer until the delimiter is found.
         while (($pos = Str\index($this->buffer, $delimiter)) === -1) {
-            $chunk = $this->reader->read(Io\Reader::DEFAULT_BYTES);
-            if ($chunk === null || $chunk === '') {
+            try {
+                $this->reader->read(4096, $chunk);
+            } catch (Io\Eof $e) {
                 $this->eof = true;
                 $string = $this->buffer === '' ? null : $this->buffer;
                 $this->buffer = '';

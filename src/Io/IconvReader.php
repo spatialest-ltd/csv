@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Spatialest\Csv\Io;
 
+use Castor\Io\Reader;
+
 /**
  * Class IconvReader.
  */
@@ -33,12 +35,14 @@ final class IconvReader implements Reader
         $this->source = $source;
     }
 
-    public function read(int $bytes = self::DEFAULT_BYTES): ?string
+    /**
+     * {@inheritDoc}
+     */
+    public function read(int $length, string &$bytes): int
     {
-        if (($chunk = $this->reader->read($bytes)) !== null) {
-            return iconv($this->source, 'UTF-8//TRANSLIT', $chunk);
-        }
+        $this->reader->read($length, $bytes);
+        $bytes = iconv($this->source, 'UTF-8//TRANSLIT', $bytes);
 
-        return null;
+        return strlen($bytes);
     }
 }

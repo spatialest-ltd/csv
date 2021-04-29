@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Spatialest\Csv\BuffIo;
 
+use Castor\Io\TestReader;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -25,16 +26,9 @@ class ReaderTest extends TestCase
 {
     public function testReadStringWithNormalBytes(): void
     {
-        $readerMock = $this->createMock(\Spatialest\Csv\Io\Reader::class);
+        $reader = TestReader::fromString("This is line one\nThis is line two\nThis is line three\nThis is line four");
 
-        $readerMock->expects(self::exactly(2))
-            ->method('read')
-            ->willReturnOnConsecutiveCalls(
-                "This is line one\nThis is line two\nThis is line three\nThis is line four",
-                null
-            );
-
-        $reader = new Reader($readerMock);
+        $reader = new Reader($reader);
         self::assertSame("This is line one\n", $reader->readString("\n"));
         self::assertSame("This is line two\n", $reader->readString("\n"));
         self::assertSame("This is line three\n", $reader->readString("\n"));
@@ -44,16 +38,8 @@ class ReaderTest extends TestCase
 
     public function testReadLinesWithConsecutiveDelimiters(): void
     {
-        $readerMock = $this->createMock(\Spatialest\Csv\Io\Reader::class);
-
-        $readerMock->expects(self::exactly(2))
-            ->method('read')
-            ->willReturnOnConsecutiveCalls(
-                "This is line one\n\nThis is line three\nThis is line four",
-                null
-            );
-
-        $reader = new Reader($readerMock);
+        $reader = TestReader::fromString("This is line one\n\nThis is line three\nThis is line four");
+        $reader = new Reader($reader);
         self::assertSame("This is line one\n", $reader->readString("\n"));
         self::assertSame("\n", $reader->readString("\n"));
         self::assertSame("This is line three\n", $reader->readString("\n"));
@@ -63,43 +49,14 @@ class ReaderTest extends TestCase
 
     public function testReadLinesWithConsecutiveDelimitersAtTheEnd(): void
     {
-        $readerMock = $this->createMock(\Spatialest\Csv\Io\Reader::class);
+        $reader = TestReader::fromString("This is line one\nThis is line two\nThis is line three\nThis is line four\n\n");
+        $reader = new Reader($reader);
 
-        $readerMock->expects(self::exactly(2))
-            ->method('read')
-            ->willReturnOnConsecutiveCalls(
-                "This is line one\nThis is line two\nThis is line three\nThis is line four\n\n",
-                null
-            );
-
-        $reader = new Reader($readerMock);
         self::assertSame("This is line one\n", $reader->readString("\n"));
         self::assertSame("This is line two\n", $reader->readString("\n"));
         self::assertSame("This is line three\n", $reader->readString("\n"));
         self::assertSame("This is line four\n", $reader->readString("\n"));
         self::assertSame("\n", $reader->readString("\n"));
-        self::assertNull($reader->readString("\n"));
-    }
-
-    public function testReadLinesWithLowBytes(): void
-    {
-        $readerMock = $this->createMock(\Spatialest\Csv\Io\Reader::class);
-
-        $readerMock->expects(self::exactly(5))
-            ->method('read')
-            ->willReturnOnConsecutiveCalls(
-                'This is line ',
-                "one\nThis is line ",
-                "two\nThis is line ",
-                "three\nThis is line four",
-                null
-            );
-
-        $reader = new Reader($readerMock);
-        self::assertSame("This is line one\n", $reader->readString("\n"));
-        self::assertSame("This is line two\n", $reader->readString("\n"));
-        self::assertSame("This is line three\n", $reader->readString("\n"));
-        self::assertSame('This is line four', $reader->readString("\n"));
         self::assertNull($reader->readString("\n"));
     }
 }

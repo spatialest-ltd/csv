@@ -16,17 +16,20 @@ declare(strict_types=1);
 
 namespace Spatialest\Csv\Io;
 
+use Castor\Io\Reader;
+use Castor\Io\TestReader;
+
 /**
  * Class Stdin.
  */
-final class Stdin extends ResourceReader
+final class Stdin
 {
-    private static ?Stdin $instance = null;
+    private static ?Reader $instance = null;
 
-    public static function instance(): Stdin
+    public static function instance(): Reader
     {
         if (self::$instance === null) {
-            self::$instance = new self(STDIN);
+            self::$instance = new TestReader(STDIN);
         }
 
         return self::$instance;
