@@ -199,7 +199,7 @@ class Reader implements \IteratorAggregate
                         // Hit next quote
                         $this->recordBuffer .= substr($line, 0, $i);
                         $line = substr($line, $i + $quoteLen);
-                        $rn = $line[0];
+                        $rn = $line[0] ?? '';
                         switch (true) {
                             case $rn === $this->quote:
                                 // "" sequence. We append the quote.

@@ -16,6 +16,7 @@ declare(strict_types=1);
 
 namespace Spatialest\Csv;
 
+use Castor\Io\TestReader;
 use PHPUnit\Framework\TestCase;
 use Spatialest\Csv\RFC4180\ParseError;
 use Spatialest\Csv\RFC4180\Reader;
@@ -50,7 +51,6 @@ class CsvFunctionalTest extends TestCase
         $iterator = $reader->getIterator();
         $i = 0;
         foreach ($iterator as $record) {
-
         }
         self::assertCount(0, $iterator->getErrors());
     }
@@ -64,5 +64,16 @@ class CsvFunctionalTest extends TestCase
         foreach ($iterator as $record) {
             // Empty on purpose.
         }
+    }
+
+    public function testItParsesLineBreakCsv(): void
+    {
+        $reader = Reader::fromFile(__DIR__.'/line-break.csv');
+        $iterator = $reader->getIterator();
+        $records = [];
+        foreach ($iterator as $record) {
+            $records[] = $record;
+        }
+        self::assertCount(7, $records);
     }
 }
