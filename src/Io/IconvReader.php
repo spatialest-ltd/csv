@@ -24,15 +24,17 @@ use Castor\Io\Reader;
 final class IconvReader implements Reader
 {
     private Reader $reader;
-    private string $source;
+    private ?string $source;
+    private bool $ignore;
 
     /**
      * Windows1252Reader constructor.
      */
-    public function __construct(Reader $reader, string $source)
+    public function __construct(Reader $reader, string $source = null, bool $ignore = false)
     {
         $this->reader = $reader;
         $this->source = $source;
+        $this->ignore = $ignore;
     }
 
     /**
@@ -41,7 +43,11 @@ final class IconvReader implements Reader
     public function read(int $length, string &$bytes): int
     {
         $this->reader->read($length, $bytes);
-        $bytes = iconv($this->source, 'UTF-8//TRANSLIT', $bytes);
+        if ($this->source = null) {
+            $this->source = mb_detect_encoding($bytes);
+        }
+        $target = sprintf('UTF-8//%s', $this->ignore ? 'IGNORE' : 'TRANSLIT');
+        $bytes = iconv($this->source, $target, $bytes);
 
         return strlen($bytes);
     }
