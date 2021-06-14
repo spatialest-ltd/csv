@@ -43,7 +43,7 @@ final class IconvReader implements Reader
     public function read(int $length, string &$bytes): int
     {
         $this->reader->read($length, $bytes);
-        if ($this->source = null) {
+        if ($this->source === null) {
             $this->source = mb_detect_encoding($bytes);
         }
         $target = sprintf('UTF-8//%s', $this->ignore ? 'IGNORE' : 'TRANSLIT');
